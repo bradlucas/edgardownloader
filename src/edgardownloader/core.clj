@@ -1,19 +1,22 @@
 (ns edgardownloader.core
-  (use [clojure.contrib.io :as io :include (to-byte-array input-string as-url) :exclude [spit make-parents]])
+  (:gen-class)
   (:require  [clojure.xml :as xml]
              [clojure.zip :as zip]
              [clojure.contrib.string]
              [clojure.contrib.zip-filter.xml :as zf]
-             [clojure.java.io]
-             )
+             [clojure.java.io])
+  (:use [clojure.contrib.io :as io :include (to-byte-array input-string as-url) :exclude [spit make-parents]]
+        [clojure.pprint])
   (:import [java.io File FileOutputStream])
   (:import [java.util.zip ZipFile]))
 
 
 ;; Definitions
-(def *edgar-rss-url* "http://www.sec.gov/Archives/edgar/xbrlrss.all.xml")
+(def *edgar-rss-url* "https://www.sec.gov/Archives/edgar/xbrlrss.all.xml")
 (def *download-dir* "downloads")
 
+(defn get-edgar-rss []
+  (slurp *edgar-rss-url*))
 
 (defn get-commodity-xls-files []
   (re-seq #"[a-z0-9-]+\.xls" (slurp "http://minerals.usgs.gov/ds/2005/140/")) )
@@ -37,8 +40,6 @@
 
 
 
-(defn get-edgar-rss []
-  (slurp "http://www.sec.gov/Archives/edgar/xbrlrss.all.xml"))
 
 (defn parse-items [xml-file]
   (let [xml-parse (xml/parse xml-file)
@@ -215,7 +216,7 @@
     ))
 
 (defn download-ten-qs []
-  (let [items (get-ten-qs (get-items *edgar-rss-url*))]
+  (let [items (get-ten-qs (get-items (get-edgar-rss)))]
     (doseq [item items]
       (download-binary (url-filename item) (url item)))))
 
@@ -230,3 +231,5 @@
 ;; download-dir
 
 
+(defn -main [& args]
+  (clojure.pprint/pprint (get-ten-qs (get-items *edgar-rss-url*))))
