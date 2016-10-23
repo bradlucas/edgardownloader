@@ -6,8 +6,9 @@ EDGAR filings download routines. Some older code which could use some attention.
 
 ## Usage
 
-- java -jar target/edgardownloader-1.0.0-SNAPSHOT-standalone.jar
+Show 10q data items
 
+- java -jar target/edgardownloader-1.0.0-SNAPSHOT-standalone.jar
 
 ## License
 
